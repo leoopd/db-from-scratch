@@ -2,7 +2,6 @@ package entries
 
 import (
 	"encoding/binary"
-	"fmt"
 	"io"
 )
 
@@ -35,7 +34,7 @@ func (ent *Entry) Decode(r io.Reader) error {
 	keyLenSlice := make([]byte, 4)
 	n, err := r.Read(keyLenSlice)
 	if n != 4 || err != nil {
-		return fmt.Errorf("failed to read key-length. err: %v", err)
+		return err
 	}
 	keyLen := binary.LittleEndian.Uint32(keyLenSlice)
 
@@ -43,7 +42,7 @@ func (ent *Entry) Decode(r io.Reader) error {
 	valLenSlice := make([]byte, 4)
 	n, err = r.Read(valLenSlice)
 	if n != 4 || err != nil {
-		return fmt.Errorf("failed to read val-length. err: %v", err)
+		return err
 	}
 	valLen := binary.LittleEndian.Uint32(valLenSlice)
 
@@ -51,7 +50,7 @@ func (ent *Entry) Decode(r io.Reader) error {
 	delSlice := make([]byte, 1)
 	n, err = r.Read(delSlice)
 	if n != 1 || err != nil {
-		return fmt.Errorf("failed to read key-value. err: %v", err)
+		return err
 	}
 	deleted := false
 	if delSlice[0] == 1 {
@@ -62,14 +61,14 @@ func (ent *Entry) Decode(r io.Reader) error {
 	key := make([]byte, keyLen)
 	n, err = r.Read(key)
 	if n != int(keyLen) || err != nil {
-		return fmt.Errorf("failed to read key-value. err: %v", err)
+		return err
 	}
 
 	// read next full value, using the length determined earlier
 	val := make([]byte, valLen)
 	n, err = r.Read(val)
 	if n != int(valLen) || err != nil {
-		return fmt.Errorf("failed to read val-value. err: %v", err)
+		return err
 	}
 
 	// persist values after all operations succeeded
