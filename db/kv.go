@@ -27,6 +27,10 @@ func (kv *KV) Open() error {
 		eof, err = kv.log.Read(&entry)
 		// only return if the error needs to be handled explicitly
 		if err != nil && err != io.EOF {
+			if err == io.ErrUnexpectedEOF || err == ErrBadSum {
+				// we ignore faulty log lines
+				continue
+			}
 			return err
 		}
 		if entry.deleted {

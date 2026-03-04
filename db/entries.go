@@ -8,8 +8,9 @@ import (
 	"io"
 )
 
+var ErrBadSum = errors.New("bad checksum")
+
 const (
-	ErrBadSum   = "bad checksum"
 	standardLen = 4
 	singleLen   = 1
 )
@@ -93,7 +94,7 @@ func (ent *Entry) Decode(r io.Reader) error {
 
 	record := bytes.Join([][]byte{keyLenSlice, valLenSlice, delSlice, key, val}, nil)
 	if csCalculated := crc32.ChecksumIEEE(record); csCalculated != binary.LittleEndian.Uint32(checksum) {
-		return errors.New(ErrBadSum)
+		return ErrBadSum
 	}
 
 	// persist values after all operations succeeded
