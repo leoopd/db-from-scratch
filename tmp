@@ -1,0 +1,16 @@
+data := make([]byte, 4+4+4+1+len("thisIsSomeKey")+len("thisIsSomeValue"))
+	binary.LittleEndian.PutUint32(data[4:8], uint32(len("thisIsSomeKey")))
+	binary.LittleEndian.PutUint32(data[8:12], uint32(len("thisIsSomeValue")))
+	data[12] = 0
+	if false {
+		data[12] = 1
+	}
+	copy(data[13:], "thisIsSomeKey")
+	copy(data[13+len("thisIsSomeKey"):], "thisIsSomeValue")
+
+	checksum := crc32.ChecksumIEEE(data[4:])
+	binary.LittleEndian.PutUint32(data[:4], checksum)
+	fmt.Println(data)
+	fmt.Println(checksum)
+
+	[245 148 245 50 13 0 0 0 15 0 0 0 0 116 104 105 115 73 115 83 111 109 101 75 101 121 116 104 105 115 73 115 83 111 109 101 86 97 108 117 101]
